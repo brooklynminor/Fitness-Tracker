@@ -2,10 +2,8 @@ const express = require("express");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const path = require('path');
-const  db = require("./models");
-//do I need this???
-const mongojs = require('mongojs')
-const db = mongojs(connectionString, [collections])
+const  Workout = require("./models/workout");
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,6 +16,7 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
+//wrap in db?
 mongoose.connect(
   process.env.MONGODB_URI || 'mongodb://localhost/workout_db',
  {
@@ -28,7 +27,16 @@ mongoose.connect(
 });
 
 app.post("/api/workouts", (req, res) => {
-  db.workout.create( req.body )
+  Workout.create( req.body )
+    .then(dbWorkout => {
+      res.json(dbWorkout);
+    })
+    .catch(err => {
+      res.status(404).json(err);
+    });
+});
+app.put("/api/workouts/:id", (req, res) => {
+  Workout.findByIdAndUpdate( req.params.id,  { $push: { exercises: req.body } })
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
@@ -38,7 +46,7 @@ app.post("/api/workouts", (req, res) => {
 });
 
 app.get("/api/workouts", (req, res) => {
-  db.workout.find({})
+  Workout.find({})
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
@@ -56,7 +64,7 @@ app.get("/exercise", (req, res) => {
 });
 
 app.get("/api/workouts/range", (req, res) => {
-  db.workout.find({ Date })
+  Workout.find({})
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
@@ -64,8 +72,7 @@ app.get("/api/workouts/range", (req, res) => {
       res.status(404).json(err);
     });
 });
-// routes
-app.use(require("./routes/api.js"));
+
 //fat arrow notation
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}!`);
