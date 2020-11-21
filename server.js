@@ -3,14 +3,15 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const path = require('path');
 const  db = require("./models");
-
+//do I need this???
+const mongojs = require('mongojs')
+const db = mongojs(connectionString, [collections])
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
 app.use(logger("dev"));
-
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -55,7 +56,7 @@ app.get("/exercise", (req, res) => {
 });
 
 app.get("/api/workouts/range", (req, res) => {
-  db.workout.find({})
+  db.workout.find({ Date })
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
