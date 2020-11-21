@@ -15,11 +15,8 @@ let Workout = new Schema ({
         distance: Number,
       }
     ]
-    // YOUR CODE HERE - SCHEMA
+
 });
 
 module.exports = mongoose.model('Workout', Workout);
 
-// {
-    
-// //   }
